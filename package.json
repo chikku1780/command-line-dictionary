@@ -1,0 +1,14 @@
+{
+  "name": "command-line-dictionary",
+  "version": "1.0.0",
+  "description": "It is a command line dictionary tool where you get results from wordnik api",
+  "main": "main",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "Chikku",
+  "license": "ISC"
+}
