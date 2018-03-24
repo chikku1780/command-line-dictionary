@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.6.0",
+    "readline-sync": "^1.4.9",
     "request": "^2.85.0"
   },
   "devDependencies": {

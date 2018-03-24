@@ -1,3 +1,5 @@
+const readlineSync = require('readline-sync');
+
 const service = require('./service');
 const util = require('./util');
 
@@ -9,6 +11,10 @@ const keywords = {
     DICT: 'dict',
     PLAY: 'play'
 };
+const controlWords = {
+    quit: 'quit',
+    QUIT: 'QUIT'
+}
 
 
 init();
@@ -88,7 +94,28 @@ function startProcess() {
 }
 
 function playWordGame() {
-    console.log('Under Construction');
+    let word = getInformationFromConsole();
+    util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
+    gerWordCompleteInformation(word, function (data) {
+        formatResult(data);
+        playWordGame();
+    });
+}
+
+function getInformationFromConsole() {
+    let input = readlineSync.question('\nEnter word to search - ');
+    if (!util.isUndefinedNullEmptyString(input)) {
+        if (input === controlWords.quit) {
+            exit();
+        }
+        else {
+            return input;
+        }
+    }
+    else {
+        console.log('Wrong Input');
+        getInformationFromConsole();
+    }
 }
 
 function getInformationFromCommandLine() {
@@ -152,4 +179,9 @@ function formatWordOfDayResult(data) {
     util.consoleTheWord(util.OUTPUT_FORMAT.tWord, word);
     util.consoleTheWord_Definition(definitions);
     util.consoleTheEND();
+}
+
+function exit() {
+    console.log('\nThanks for using this tool - Have a good day! \n');
+    process.exit(0);
 }

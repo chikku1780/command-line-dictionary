@@ -38,7 +38,8 @@ service.getWordDefinition = function (word, cb) {
     let params = {};
     params.limit = 10;
     params.includeRelated = true;
-    params.useCanonical = false;
+    params.useCanonical = true;
+    // params.useCanonical = false;
     params.includeTags = false;
     let url = this.prepareURL(urls.definition(word), word, params);
     makeRequest(url, function (err, resp) {
@@ -127,7 +128,9 @@ function makeRequest(apiURL, cb) {
         if (error) {
             console.log(error);
         }
-        cb(error, JSON.parse(body));
+        else {
+            cb(error, JSON.parse(body));
+        }
     });
 }
 
