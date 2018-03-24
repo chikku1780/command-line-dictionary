@@ -41,34 +41,69 @@ service.getWordDefinition = function (word, cb) {
     params.useCanonical = false;
     params.includeTags = false;
     let url = this.prepareURL(urls.definition(word), word, params);
-    return makeRequest(url, function (err, resp) {
+    makeRequest(url, function (err, resp) {
         cb(resp);
     });
 };
 
 service.getWordSynonyms = function (word, cb) {
     let params = {};
-    params.relationshipTypes = 'synonym';
+    params.relationshipTypes = this.relatedTypes.SYN;
     params.useCanonical = false;
     params.limitPerRelationshipType = 10;
     let url = this.prepareURL(urls.relatedWords(word), word, params);
-    return makeRequest(url, function (err, resp) {
-        cb(resp);
+    makeRequest(url, function (err, resp) {
+        let synonyms = [];
+        if (!util.isEmptyArray(resp) && !util.isEmptyArray(resp[0].words)) {
+            synonyms = resp[0].words;
+        }
+        cb(synonyms);
     });
 };
 
 service.getWordAntonyms = function (word, cb) {
     let params = {};
-    params.relationshipTypes = 'antonym';
+    params.relationshipTypes = this.relatedTypes.ANT;
     params.useCanonical = false;
     params.limitPerRelationshipType = 10;
     let url = this.prepareURL(urls.relatedWords(word), word, params);
-    return makeRequest(url, function (err, resp) {
-        cb(resp);
+    makeRequest(url, function (err, resp) {
+        let antonyms = [];
+        if (!util.isEmptyArray(resp) && !util.isEmptyArray(resp[0].words)) {
+            antonyms = resp[0].words;
+        }
+        cb(antonyms);
     });
 };
 
-service.getWordExample = function (word, cb) {
+service.getWordRelatedWords = function (word, cb) {
+    let params = {};
+    params.useCanonical = false;
+    params.limitPerRelationshipType = 10;
+    let url = this.prepareURL(urls.relatedWords(word), word, params);
+    makeRequest(url, function (err, resp) {
+        let relatedWords = {};
+        if (!util.isEmptyArray(resp)) {
+            let synonyms = resp.filter(function (relatedWord) {
+                return relatedWord.relationshipType === service.relatedTypes.SYN;
+            });
+            let antonyms = resp.filter(function (relatedWord) {
+                return relatedWord.relationshipType === service.relatedTypes.ANT;
+            });
+            if (!util.isEmptyArray(synonyms)) {
+                synonyms = synonyms[0].words;
+            }
+            if (!util.isEmptyArray(antonyms)) {
+                antonyms = antonyms[0].words;
+            }
+            relatedWords.synonyms = synonyms;
+            relatedWords.antonyms = antonyms;
+        }
+        cb(relatedWords);
+    });
+};
+
+service.getWordExamples = function (word, cb) {
     let params = {};
     params.useCanonical = false;
     let url = this.prepareURL(urls.example(word), word, params);

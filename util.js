@@ -1,49 +1,50 @@
 const util = {};
 
 util.OUTPUT_FORMAT = {
-    yWOrd: '\n Your Word is - ',
-    tWord: '\n Today\'s Word is - ',
+    yWOrd: 'Your Word is - ',
+    tWord: 'Today\'s Word is - ',
 };
 
 util.consoleTheWord = function (pre, word) {
-    console.log('==========================================');
+    console.log('\n==========================================\n');
     console.log(pre + word + '\n');
 };
 
 util.consoleTheEND = function () {
-    console.log('==========================================');
+    console.log('\n==========================================\n');
 };
 
 util.consoleTheWord_Definition = function (definitions) {
+    console.log('Definitions :: ');
     if (!util.isEmptyArray(definitions)) {
-        console.log('-------- Definitions : START --------');
         definitions.forEach(function (definition) {
-            // let seq = definition.sequence;
             let pos = definition.partOfSpeech;
             let text = definition.text;
-            // let sourceDictionary = definition.text;
-            // console.log(seq + '.');
-            console.log('Type : ' + pos);
-            console.log('Def : ' + text);
-            console.log('----------')
+            console.log('\t\t (' + pos + ') - ' + text);
         });
-        console.log('-------- Definitions : END --------');
+    }
+    else {
+        console.log('\t\t - ');
     }
 };
 
 util.consoleTheWord_RelatedWords = function (type, relatedWords) {
+    console.log(util.capitalize(type) + 's :: ');
     if (!util.isEmptyArray(relatedWords)) {
-        console.log('-------- ' + util.capitalize(type) + ' : START --------');
-        console.log(relatedWords.join());
-        console.log('-------- ' + util.capitalize(type) + ' : END --------');
+        console.log('\t\t - ' + relatedWords.join());
+    }
+    else {
+        console.log('\t\t - ');
     }
 };
 
 util.consoleTheWord_Example = function (example) {
-    if (!util.isEmptyObject(example)) {
-        console.log('-------- Example : START --------');
-        console.log(example.text);
-        console.log('-------- Example : END --------');
+    console.log('Examples :: ');
+    if (!util.isEmptyObject(example) && !util.isUndefinedNullEmptyString(example.text)) {
+        console.log('\t\t - ' + example.text);
+    }
+    else {
+        console.log('\t\t - ');
     }
 };
 

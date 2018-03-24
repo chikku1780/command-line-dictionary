@@ -21,74 +21,109 @@ function init() {
 function startProcess() {
     let args = getInformationFromCommandLine();
     if (args.length === 0) {
-        getWordOfTheDayInfo(function (result) {
-            formatWordOfDayResult(result);
+        getWordOfTheDayInfo(function (resp) {
+            if (!util.isUndefinedNullEmptyString(resp)) {
+                let word = resp.word;
+                util.consoleTheWord(util.OUTPUT_FORMAT.tWord, word);
+                gerWordCompleteInformation(word, function (data) {
+                    formatResult(data);
+                });
+            }
         });
     }
-    else {
-        if (args.length === 2) {
-            let key = args[0];
-            let word = args[1];
-
-            switch (key) {
-                case keywords.DEF:
-                    getWordDefinitions(word, function (definitions) {
-                        if (!util.isEmptyArray(definitions)) {
-                            util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
-                            util.consoleTheWord_Definition(definitions);
-                        }
-                    });
-                    break;
-                case keywords.SYN:
-                    getWordSynonyms(word, function (data) {
-                        if (!util.isEmptyArray(data) && !util.isEmptyArray(data[0].words)) {
-                            let synonyms = data[0].words;
-                            util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
-                            util.consoleTheWord_RelatedWords(service.relatedTypes.SYN, synonyms);
-                        }
-                    });
-                    break;
-                case keywords.ANT:
-                    getWordSynonyms(word, function (data) {
-                        if (!util.isEmptyArray(data) && !util.isEmptyArray(data[0].words)) {
-                            let antonyms = data[0].words;
-                            util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
-                            util.consoleTheWord_RelatedWords(service.relatedTypes.ANT, antonyms);
-                        }
-                    });
-                    break;
-                case keywords.EX:
-                    getWordExample(word, function (example) {
-                        if (!util.isEmptyObject(example)) {
-                            util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
-                            util.consoleTheWord_Example(example);
-                        }
-                    });
-                    break;
-                default:
-                    break;
-            }
+    else if (args.length === 1) {
+        let word = args[0];
+        if (word === keywords.PLAY) {
+            playWordGame();
+        }
+        else {
+            util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
+            gerWordCompleteInformation(word, function (data) {
+                formatResult(data);
+            });
         }
     }
+    else if (args.length === 2) {
+        let key = args[0];
+        let word = args[1];
+        util.consoleTheWord(util.OUTPUT_FORMAT.yWOrd, word);
+        switch (key) {
+            case keywords.DEF:
+                getWordDefinitions(word, function (definitions) {
+                    util.consoleTheWord_Definition(definitions);
+                    util.consoleTheEND();
+                });
+                break;
+            case keywords.SYN:
+                getWordSynonyms(word, function (synonyms) {
+                    util.consoleTheWord_RelatedWords(service.relatedTypes.SYN, synonyms);
+                    util.consoleTheEND();
+                });
+                break;
+            case keywords.ANT:
+                getWordAntonyms(word, function (antonyms) {
+                    util.consoleTheWord_RelatedWords(service.relatedTypes.ANT, antonyms);
+                    util.consoleTheEND();
+                });
+                break;
+            case keywords.EX:
+                getWordExamples(word, function (example) {
+                    util.consoleTheWord_Example(example);
+                    util.consoleTheEND();
+                });
+                break;
+            case keywords.DICT:
+                gerWordCompleteInformation(word, function (data) {
+                    formatResult(data);
+                });
+                break;
+            default:
+                console.log('Wrong Input !!!');
+                break;
+        }
+    }
+    else {
+        console.log('Wrong Input !!!');
+    }
+}
+
+function playWordGame() {
+    console.log('Under Construction');
 }
 
 function getInformationFromCommandLine() {
     return process.argv.slice(2);
 }
 
+function formatResult(data) {
+    let definitions = data.definitions;
+    let synonyms = data.synonyms;
+    let antonyms = data.antonyms;
+    let examples = data.examples;
+    util.consoleTheWord_Definition(definitions);
+    util.consoleTheWord_RelatedWords(service.relatedTypes.SYN, synonyms);
+    util.consoleTheWord_RelatedWords(service.relatedTypes.ANT, antonyms);
+    util.consoleTheWord_Example(examples);
+    util.consoleTheEND();
+}
+
+function gerWordCompleteInformation(word, cb) {
+    let result = {};
+    getWordDefinitions(word, function (definitions) {
+        result.definitions = definitions;
+        getWordRelatedWords(word, function (relatedWords) {
+            result.synonyms = relatedWords.synonyms ? relatedWords.synonyms : [];
+            result.antonyms = relatedWords.antonyms ? relatedWords.antonyms : [];
+            getWordExamples(word, function (examples) {
+                result.examples = examples;
+                cb(result);
+            });
+        });
+    });
+}
+
 function getWordOfTheDayInfo(cb) {
     service.getWordOfTheDay(cb);
-}
-
-function formatWordOfDayResult(data) {
-    let word = data.word;
-    let definitions = data.definitions;
-    util.consoleTheWord(util.OUTPUT_FORMAT.tWord, word);
-    util.consoleTheWord_Definition(definitions);
-}
-
-function formatResult(word) {
-
 }
 
 function getWordDefinitions(word, cb) {
@@ -103,6 +138,18 @@ function getWordAntonyms(word, cb) {
     service.getWordAntonyms(word, cb);
 }
 
-function getWordExample(word, cb) {
-    service.getWordExample(word, cb);
+function getWordRelatedWords(word, cb) {
+    service.getWordRelatedWords(word, cb);
+}
+
+function getWordExamples(word, cb) {
+    service.getWordExamples(word, cb);
+}
+
+function formatWordOfDayResult(data) {
+    let word = data.word;
+    let definitions = data.definitions;
+    util.consoleTheWord(util.OUTPUT_FORMAT.tWord, word);
+    util.consoleTheWord_Definition(definitions);
+    util.consoleTheEND();
 }
